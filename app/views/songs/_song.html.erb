@@ -1,0 +1,52 @@
+<div id="<%= dom_id song %>">
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Link:</strong>
+    <%= song.link %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Title:</strong>
+    <%= song.title %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Length:</strong>
+    <%= song.length %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Rating:</strong>
+    <%= song.rating %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Views:</strong>
+    <%= song.views %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">State:</strong>
+    <%= song.state %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Thumbnail:</strong>
+    <%= image_tag song.thumbnail if song.thumbnail.attached? %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Video:</strong>
+    <%= video_tag song.video, controls: true if song.video.attached? %>
+  </p>
+
+  <p class="my-5">
+    <strong class="block font-medium mb-1">Audio:</strong>
+    <%= link_to song.audio.filename, song.audio if song.audio.attached? %>
+  </p>
+
+  <% if action_name != "show" %>
+    <%= link_to "Show this song", song, class: "rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <%= link_to "Edit this song", edit_song_path(song), class: "rounded-lg py-3 ml-2 px-5 bg-gray-100 inline-block font-medium" %>
+    <hr class="mt-6">
+  <% end %>
+</div>

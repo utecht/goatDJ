@@ -1,0 +1,22 @@
+<div class="mx-auto md:w-2/3 w-full flex">
+  <div class="mx-auto">
+    <% if notice.present? %>
+      <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+    <% end %>
+
+    <h1 class="text-3xl font-bold mb-5"><%= @room.name %></h1>
+    <p class="mb-5"><%= @room.description %></p>
+
+    <div data-controller="room" data-room-id-value="<%= @room.id %>">
+      <%= video_tag @song.video, controls: true, data: {'room-target': 'videoPlayer'} if @song.video.attached? %>
+      <button data-action="click->room#play" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5">Play</button>
+      <button data-action="click->room#pause" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5">Pause</button>
+      <button data-action="click->room#sync" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5">Sync</button>
+    </div>
+  </div>
+</div>
+
+<% content_for :footer_links do %>
+  <li><%= link_to "Edit this room", edit_room_path(@room), class: "hover:underline me-4 md:me-6" %></li>
+  <li><%= link_to "Back to rooms", rooms_path, class: "hover:underline me-4 md:me-6" %></li>
+<% end %>
