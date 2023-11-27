@@ -7,8 +7,9 @@ class DownloadSongJob < ApplicationJob
   def perform(*args)
     @song = Song.find(args[0])
     puts @song.inspect
+    YoutubeDL::Command.config.default_options = { format: 'mp4' }
     video = YoutubeDL.download(@song.link).call
-    puts video.destination
+    puts video.pretty_inspect
     duration_string = video.info['duration_string']
     # convert minutes:seconds to seconds
     duration = duration_string.split(':').map(&:to_i).inject(0) { |a, b| a * 60 + b }
@@ -34,8 +35,8 @@ class DownloadSongJob < ApplicationJob
       filename: video_title
     )
     @song.video.attach(video.destination)
-
-
     @song.save
+    # delete downloaded video file
+    File.delete(video.destination)
   end
 end

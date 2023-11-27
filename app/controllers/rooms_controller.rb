@@ -9,6 +9,11 @@ class RoomsController < ApplicationController
   # GET /rooms/1 or /rooms/1.json
   def show
     @song = @room.current_song
+    unless @song
+      @room.add_songs_to_playlist(Song.all.shuffle)
+      @song = @room.current_song
+    end
+    @offset = @room.song_offset
   end
 
   # GET /rooms/new
@@ -27,7 +32,8 @@ class RoomsController < ApplicationController
 
   def next_song
     @room.next_song
-    redirect_to room_url(@room)
+    return true
+    # redirect_to room_url(@room)
   end
 
   # POST /rooms or /rooms.json
