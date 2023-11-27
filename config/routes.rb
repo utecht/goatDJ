@@ -1,5 +1,10 @@
 Rails.application.routes.draw do
-  resources :rooms
+  resources :rooms do
+    member do
+      post :shuffle_songs
+      post :next_song
+    end
+  end
   resources :songs do
     member do
       post :queue_download

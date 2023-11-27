@@ -1,4 +1,4 @@
-<div class="mx-auto md:w-2/3 w-full flex">
+<div class="mx-auto w-full flex" data-controller="room" data-room-id-value="<%= @room.id %>">
   <div class="mx-auto">
     <% if notice.present? %>
       <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
@@ -7,12 +7,24 @@
     <h1 class="text-3xl font-bold mb-5"><%= @room.name %></h1>
     <p class="mb-5"><%= @room.description %></p>
 
-    <div data-controller="room" data-room-id-value="<%= @room.id %>">
-      <%= video_tag @song.video, controls: true, data: {'room-target': 'videoPlayer'} if @song.video.attached? %>
+    <div>
+      <%= video_tag @song.video, controls: true, autoplay: true, data: {'room-target': 'videoPlayer'} if @song and @song.video.attached? %>
       <button data-action="click->room#play" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5">Play</button>
       <button data-action="click->room#pause" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5">Pause</button>
       <button data-action="click->room#sync" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5">Sync</button>
     </div>
+  </div>
+  <div class="m-5">
+    <h2 class="text-2xl font-bold mb-5">Queue</h2>
+    <div class="mb-5 flex">
+      <%= button_to "Shuffle All Songs", shuffle_songs_room_path(@room), class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5 me-4" %>
+      <%= button_to "Next Song", next_song_room_path(@room), class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5 me-4" %>
+    </div>
+    <ul class="list-disc list-inside">
+      <% @room.playlist.each do |song| %>
+        <li class="mb-2"><%= link_to song.title, song %></li>
+      <% end %>
+    </ul>
   </div>
 </div>
 

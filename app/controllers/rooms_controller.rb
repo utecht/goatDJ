@@ -1,5 +1,5 @@
 class RoomsController < ApplicationController
-  before_action :set_room, only: %i[ show edit update destroy ]
+  before_action :set_room, only: %i[ show edit update destroy shuffle_songs next_song ]
 
   # GET /rooms or /rooms.json
   def index
@@ -8,7 +8,7 @@ class RoomsController < ApplicationController
 
   # GET /rooms/1 or /rooms/1.json
   def show
-    @song = Song.first
+    @song = @room.current_song
   end
 
   # GET /rooms/new
@@ -18,6 +18,16 @@ class RoomsController < ApplicationController
 
   # GET /rooms/1/edit
   def edit
+  end
+
+  def shuffle_songs
+    @room.add_songs_to_playlist(Song.all.shuffle)
+    redirect_to room_url(@room)
+  end
+
+  def next_song
+    @room.next_song
+    redirect_to room_url(@room)
   end
 
   # POST /rooms or /rooms.json
