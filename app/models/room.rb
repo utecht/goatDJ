@@ -39,13 +39,13 @@ class Room < ApplicationRecord
 		self.playlist.shift
 		if listener_count > 0
 	        song_url = rails_blob_url(self.current_song.video, only_path: true) if self.current_song&.video&.attached?
-		    ActionCable.server.broadcast("room_#{self.id}", {command: 'next_song', song_url: song_url})
 			self.start_song
+		    ActionCable.server.broadcast("room_#{self.id}", {command: 'next_song', song_url: song_url, songStart: self.song_start_time, currentTime: Time.now.to_f })
 		end
 	end
 
 	def start_song
-		Room.song_starts[self.id] = Time.now
+		Room.song_starts[self.id] = Time.now.to_f
 		PlayNextSongJob.set(wait: self.current_song.length).perform_later(self.id, self.current_song.id)
 	end
 
@@ -53,8 +53,8 @@ class Room < ApplicationRecord
 		Room.song_starts[self.id] = nil
 	end
 
-	def song_offset
-		Room.song_starts[self.id] ? Time.now - Room.song_starts[self.id] : 0
+	def song_start_time
+		Room.song_starts[self.id] ? Room.song_starts[self.id] : Time.now.to_f
 	end
 
 	def listener_count

@@ -3,11 +3,15 @@ class RoomChannel < ApplicationCable::Channel
     stream_from "room_#{params[:room_id]}"
     @room = Room.find(params[:room_id])
     @room.add_listener
+    current_time = Time.now.to_f
+    transmit({ command: 'init_sync', timestamp: current_time })
+    ActionCable.server.broadcast("room_#{params[:room_id]}", { command: 'listener_count', listener_count: @room.listener_count })
   end
 
   def unsubscribed
     @room = Room.find(params[:room_id])
     @room.remove_listener
+    ActionCable.server.broadcast("room_#{params[:room_id]}", { command: 'listener_count', listener_count: @room.listener_count })
   end
 
   def receive(data)
@@ -16,7 +20,7 @@ class RoomChannel < ApplicationCable::Channel
     when 'request_sync'
       puts "SYNC REQUEST"
       @room = Room.find(params[:room_id])
-      data = { command: 'sync', offset: @room.song_offset }
+      data = { command: 'sync', currentTime: Time.now.to_f, songStart: @room.song_start_time }
       ActionCable.server.broadcast("room_#{params[:room_id]}", data)
     else
       ActionCable.server.broadcast("room_#{params[:room_id]}", data)

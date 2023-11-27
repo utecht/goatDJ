@@ -13,7 +13,6 @@ class RoomsController < ApplicationController
       @room.add_songs_to_playlist(Song.all.shuffle)
       @song = @room.current_song
     end
-    @offset = @room.song_offset
   end
 
   # GET /rooms/new
