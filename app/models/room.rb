@@ -7,7 +7,7 @@ class Room < ApplicationRecord
 	end
 
 	def add_song_to_playlist(song)
-		self.add_songs_to_playlist([song.id])
+		self.add_songs_to_playlist([song])
 	end
 
 	def add_songs_to_playlist(songs)
@@ -23,11 +23,16 @@ class Room < ApplicationRecord
 	end
 
 	def playlist
-		Song.find(JSON.parse(REDIS.get("rooms:#{self.id}:playlist"))) || []
+		r = REDIS.get("rooms:#{self.id}:playlist")
+		return [] unless r
+		Song.find(JSON.parse(r))
 	end
 
 	def current_song
-		playlist = JSON.parse(REDIS.get("rooms:#{self.id}:playlist"))
+		r = REDIS.get("rooms:#{self.id}:playlist") 
+		return nil unless r
+		playlist = JSON.parse(r)
+		return nil if playlist.empty?
 		Song.find(playlist.first)
 	end
 
