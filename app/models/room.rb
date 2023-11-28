@@ -2,46 +2,44 @@ class Room < ApplicationRecord
 	include Rails.application.routes.url_helpers
 	validates :name, presence: true
 
-	@playlists = {}
-	@song_starts = {}
-	@listener_count = Hash.new(0)
-
-	class << self
-		attr_accessor :playlists
-		attr_accessor :song_starts
-		attr_accessor :listener_count
+	def set_playlist(playlist)
+	    REDIS.set("rooms:#{self.id}:playlist", playlist.pluck(:id).to_json)
 	end
 
 	def add_song_to_playlist(song)
-		Room.playlists[self.id] ||= []
-		Room.playlists[self.id] << song
+		self.add_songs_to_playlist([song.id])
 	end
 
 	def add_songs_to_playlist(songs)
-		Room.playlists[self.id] ||= []
-		Room.playlists[self.id] += songs
+		current_playlist = self.playlist
+		current_playlist += songs
+		self.set_playlist(current_playlist)
 	end
 
 	def remove_song_from_playlist(song)
-		Room.playlists[self.id] ||= []
-		Room.playlists[self.id].delete(song)
+		current_playlist = self.playlist
+		current_playlist.delete(song.id)
+		self.set_playlist(current_playlist)
 	end
 
 	def playlist
-		Room.playlists[self.id] || []
+		Song.find(JSON.parse(REDIS.get("rooms:#{self.id}:playlist"))) || []
 	end
 
 	def current_song
-		self.playlist.first
+		playlist = JSON.parse(REDIS.get("rooms:#{self.id}:playlist"))
+		Song.find(playlist.first)
 	end
 
 	def shuffle_playlist
-		self.playlist.shuffle!
+		current_playlist = self.playlist.shuffle
+		self.set_playlist(current_playlist)
 		self.next_song
 	end
 
 	def next_song
-		self.playlist.shift
+		current_playlist = self.playlist.drop(1)
+		self.set_playlist(current_playlist)
 		if listener_count > 0
 			if self.playlist.empty?
 				self.add_song_to_playlist(Song.all.sample)
@@ -52,25 +50,29 @@ class Room < ApplicationRecord
 		end
 	end
 
+	def song_start
+		REDIS.get("rooms:#{self.id}:song_start").to_f || 0
+	end
+
 	def start_song
-		Room.song_starts[self.id] = Time.now.to_f
+	    REDIS.set("rooms:#{self.id}:song_start", Time.now.to_f)
 		PlayNextSongJob.set(wait: self.current_song.length).perform_later(self.id, self.current_song.id)
 	end
 
 	def end_song
-		Room.song_starts[self.id] = nil
+	    REDIS.set("rooms:#{self.id}:song_start", nil)
 	end
 
 	def song_start_time
-		Room.song_starts[self.id] ? Room.song_starts[self.id] : Time.now.to_f
+		self.song_start ? self.song_start : Time.now.to_f
 	end
 
 	def listener_count
-		Room.listener_count[self.id]
+		REDIS.get("rooms:#{self.id}:listener_count").to_i
 	end
 
 	def add_listener
-		Room.listener_count[self.id] += 1
+		REDIS.incr("rooms:#{self.id}:listener_count")
 		if self.listener_count == 1
 			unless self.current_song
 				self.add_songs_to_playlist(Song.all.shuffle)
@@ -80,7 +82,7 @@ class Room < ApplicationRecord
 	end
 
 	def remove_listener
-		Room.listener_count[self.id] -= 1
+		REDIS.decr("rooms:#{self.id}:listener_count")
 		if self.listener_count == 0
 			# self.end_song
 		end
