@@ -15,6 +15,12 @@ export default class extends Controller {
     this.videoPlayerTarget.play();
   }
 
+  disconnect() {
+    console.log("disconnecting controller");
+    this.videoPlayerTarget.pause();
+    this.roomChannel.unsubscribe();
+  }
+
   syncSong() {
     this.videoPlayerTarget.currentTime = this.currentTimeValue - this.songStartValue;
     console.log("Setting player timestamp: " + (this.currentTimeValue - this.songStartValue));

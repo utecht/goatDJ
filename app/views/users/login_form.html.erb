@@ -1,3 +1,14 @@
+<div id="flashes" class="min-w-full flex justify-center">
+  <% if flash[:notice] %>
+    <p id="notice_flash" class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block"><%= flash[:notice] %></p>
+  <% end %>
+  <% if flash[:alert] %>
+    <p id="alert_flash" class="py-2 px-3 bg-yellow-50 mb-5 text-yellow-500 font-medium rounded-lg inline-block"><%= flash[:alert] %></p>
+  <% end %>
+  <% if flash[:error] %>
+    <p id="error_flash" class="py-2 px-3 bg-red-50 mb-5 text-red-500 font-medium rounded-lg inline-block"><%= flash[:error] %></p>
+  <% end %>
+</div>
 <div class="flex min-w-full min-h-full flex-col justify-center px-6 py-12 lg:px-8">
   <div class="sm:mx-auto sm:w-full sm:max-w-sm">
     <img class="mx-auto h-10 w-auto" src="goatdj_icon.png" alt="GoatDJ">

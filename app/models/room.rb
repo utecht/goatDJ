@@ -35,9 +35,17 @@ class Room < ApplicationRecord
 		self.playlist.first
 	end
 
+	def shuffle_playlist
+		self.playlist.shuffle!
+		self.next_song
+	end
+
 	def next_song
 		self.playlist.shift
 		if listener_count > 0
+			if self.playlist.empty?
+				self.add_song_to_playlist(Song.all.sample)
+			end
 	        song_url = rails_blob_url(self.current_song.video, only_path: true) if self.current_song&.video&.attached?
 			self.start_song
 		    ActionCable.server.broadcast("room_#{self.id}", {command: 'next_song', song_url: song_url, songStart: self.song_start_time, currentTime: Time.now.to_f })
@@ -74,7 +82,7 @@ class Room < ApplicationRecord
 	def remove_listener
 		Room.listener_count[self.id] -= 1
 		if self.listener_count == 0
-			self.end_song
+			# self.end_song
 		end
 	end
 

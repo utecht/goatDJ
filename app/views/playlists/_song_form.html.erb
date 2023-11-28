@@ -1,0 +1,5 @@
+<%= form_with url: add_song_playlist_path(@playlist), method: :post do |form| %>
+  <%= form.label :song_id, 'Choose a Song' %>
+  <%= form.collection_select :song_id, @songs, :id, :title, prompt: "Select a song" %>
+  <%= form.submit "Add Song", class: "rounded-lg py-3 px-5 bg-blue-100 inline-block font-medium" %>
+<% end %>

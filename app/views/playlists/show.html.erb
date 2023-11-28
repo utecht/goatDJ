@@ -1,0 +1,31 @@
+<div class="mx-auto md:w-2/3 w-full flex">
+  <div class="mx-auto">
+    <% if notice.present? %>
+      <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>
+    <% end %>
+
+    <%= render @playlist %>
+
+    <div class="mt-16 mb-16">
+      <h2>Songs in Playlist</h2>
+
+      <% @playlist.songs.each do |song| %>
+        <div class="flex justify-between items-center">
+          <p><%= song.title %></p> <!-- Replace 'name' with the attribute you want to display -->
+          <div class="cursor-pointer">
+            <%= button_to 'Remove', remove_song_playlist_path(@playlist, song_id: song.id), method: :post, class: 'rounded-lg py-3 px-5 bg-red-100 font-medium cursor-pointer' %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+
+    <%= render partial: "playlists/song_form", locals: { playlist: @playlist, songs: @songs } %>
+
+    <%= link_to "Edit this playlist", edit_playlist_path(@playlist), class: "mt-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+    <div class="inline-block ml-2">
+      <%= button_to "Destroy this playlist", playlist_path(@playlist), method: :delete, class: "mt-2 rounded-lg py-3 px-5 bg-gray-100 font-medium" %>
+    </div>
+    <%= link_to "Back to playlists", playlists_path, class: "ml-2 rounded-lg py-3 px-5 bg-gray-100 inline-block font-medium" %>
+  </div>
+</div>

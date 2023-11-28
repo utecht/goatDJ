@@ -25,6 +25,9 @@
                 <a href="/" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent" aria-current="page">Home</a>
               </li>
               <li>
+                <a href="/playlists" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Playlists</a>
+              </li>
+              <li>
                 <a href="/songs" class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Songs</a>
               </li>
               <li>
@@ -47,18 +50,7 @@
         </div>
       </nav>
 
-      <main class="container mx-auto mt-5 px-5 flex flex-col">
-        <div id="flashes" class="min-w-full flex justify-center">
-          <% if flash[:notice] %>
-            <p id="notice_flash" class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block"><%= flash[:notice] %></p>
-          <% end %>
-          <% if flash[:alert] %>
-            <p id="alert_flash" class="py-2 px-3 bg-yellow-50 mb-5 text-yellow-500 font-medium rounded-lg inline-block"><%= flash[:alert] %></p>
-          <% end %>
-          <% if flash[:error] %>
-            <p id="error_flash" class="py-2 px-3 bg-red-50 mb-5 text-red-500 font-medium rounded-lg inline-block"><%= flash[:error] %></p>
-          <% end %>
-        </div>
+      <main class="container mx-auto mt-5 px-5 flex flex-col grow">
         <%= yield %>
       </main>
 

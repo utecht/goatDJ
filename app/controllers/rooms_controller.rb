@@ -1,5 +1,5 @@
 class RoomsController < ApplicationController
-  before_action :set_room, only: %i[ show edit update destroy shuffle_songs next_song ]
+  before_action :set_room, only: %i[ show edit update destroy shuffle_songs next_song add_playlist ]
 
   # GET /rooms or /rooms.json
   def index
@@ -9,8 +9,12 @@ class RoomsController < ApplicationController
   # GET /rooms/1 or /rooms/1.json
   def show
     @song = @room.current_song
+    @playlists = []
+    if current_user
+      @playlists = current_user.playlists
+    end
     unless @song
-      @room.add_songs_to_playlist(Song.all.shuffle)
+      @room.add_songs_to_playlist(Song.all.sample(1))
       @song = @room.current_song
     end
   end
@@ -25,7 +29,13 @@ class RoomsController < ApplicationController
   end
 
   def shuffle_songs
-    @room.add_songs_to_playlist(Song.all.shuffle)
+    @room.shuffle_playlist
+    redirect_to room_url(@room)
+  end
+
+  def add_playlist
+    @playlist = Playlist.find(params[:playlist_id])
+    @room.add_songs_to_playlist(@playlist.songs)
     redirect_to room_url(@room)
   end
 

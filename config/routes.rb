@@ -1,9 +1,16 @@
 Rails.application.routes.draw do
+  resources :playlists do
+    member do
+      post :add_song
+      post :remove_song
+    end
+  end
   resources :users
   resources :rooms do
     member do
       post :shuffle_songs
       post :next_song
+      post :add_playlist
     end
   end
   resources :songs do

@@ -1,0 +1,4 @@
+<%= form_with url: add_playlist_room_path(@room), method: :post, class: "flex items-center justify-between" do |form| %>
+  <%= form.collection_select :playlist_id, @playlists, :id, :name, prompt: "Select a playlist" %>
+  <%= form.submit "Add", class: "rounded-lg py-3 px-5 bg-blue-100 inline-block font-medium" %>
+<% end %>
