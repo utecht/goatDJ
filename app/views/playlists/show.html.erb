@@ -13,7 +13,7 @@
         <div class="flex justify-between items-center">
           <p><%= song.title %></p> <!-- Replace 'name' with the attribute you want to display -->
           <div class="cursor-pointer">
-            <%= button_to 'Remove', remove_song_playlist_path(@playlist, song_id: song.id), method: :post, class: 'rounded-lg py-3 px-5 bg-red-100 font-medium cursor-pointer' %>
+            <%= button_to 'Remove', remove_song_playlist_path(@playlist, song_id: song.id), method: :post, class: 'rounded-lg py-3 px-5 bg-red-100 font-medium' %>
           </div>
         </div>
       <% end %>
