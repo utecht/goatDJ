@@ -8,7 +8,14 @@
     <%= link_to "New song", new_song_path, class: "rounded-lg py-3 px-5 bg-blue-600 text-white block font-medium" %>
   </div>
 
-  <div id="songs" class="min-w-full">
-    <%= render @songs %>
+  <div class="flex flex-1 flex-col">
+    <ul role="list" class="-mx-2 space-y-1">
+    <% @songs.each do |song| %>
+      <li>
+        <!-- Current: "bg-gray-50 text-indigo-600", Default: "text-gray-700 hover:text-indigo-600 hover:bg-gray-50" -->
+        <%= link_to song.title, song_path(song), class: "bg-gray-50 text-indigo-600 group flex gap-x-3 rounded-md p-2 pl-3 text-sm leading-6 font-semibold" %>
+      </li>
+    <% end %>
+    </ul>
   </div>
 </div>
