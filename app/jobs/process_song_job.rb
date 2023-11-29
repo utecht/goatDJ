@@ -25,14 +25,13 @@ class ProcessSongJob < ApplicationJob
     # Attach the blob to your model
     @song.thumbnail.attach(blob)
 
-    blob = ActiveStorage::Blob.create_and_upload!(
+    video_blob = ActiveStorage::Blob.create_and_upload!(
       io: File.open(video_destination),
       filename: video_title
     )
 
-    @song.video.attach(video_destination)
-    size = @song.video.blob.byte_size
-    @song.update(title: video_title, length: duration, state: size)
+    @song.video.attach(video_blob)
+    @song.update(title: video_title, length: duration, state: video_blob.byte_size)
     @song.save
 
     # delete downloaded video file

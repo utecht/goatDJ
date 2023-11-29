@@ -22,7 +22,12 @@ class DownloadSongJob < ApplicationJob
       .on_complete do |state:, line:|
         puts "Completed song download: #{state.destination}"
         ProcessSongJob.perform_later(@song.id, state.destination.to_s, state.info['duration_string'], state.info['fulltitle'], state.info['thumbnail'])
+        return
       end
       .call
+      puts "Completed outside call: #{state.destination}"
+      puts state.pretty_inspect
+      info = JSON.load(File.read(state.info_json))
+      ProcessSongJob.perform_later(@song.id, state.destination.to_s, info['duration_string'], info['fulltitle'], info['thumbnail'])
   end
 end
