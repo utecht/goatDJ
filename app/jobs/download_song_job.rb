@@ -1,42 +1,28 @@
 require 'ytdl'
-require 'open-uri'
 
 class DownloadSongJob < ApplicationJob
   queue_as :default
 
   def perform(*args)
     @song = Song.find(args[0])
-    YoutubeDL::Command.config.default_options = { format: 'mp4' }
-    video = YoutubeDL.download(@song.link).call
-    duration_string = video.info['duration_string']
-    # convert minutes:seconds to seconds
-    duration = duration_string.split(':').map(&:to_i).inject(0) { |a, b| a * 60 + b }
-
-    video_title = video.info['fulltitle']
-
-    thumbnail_url = video.info['thumbnail']
-    thumbnail_file = URI.open(thumbnail_url)
-
-    @song.update(title: video_title, length: duration)
-    @song.save
-
-    # Create a blob for the thumbnail
-    blob = ActiveStorage::Blob.create_and_upload!(
-      io: thumbnail_file,
-      filename: thumbnail_url
-    )
-
-    # Attach the blob to your model
-    @song.thumbnail.attach(blob)
-    @song.save
-
-    blob = ActiveStorage::Blob.create_and_upload!(
-      io: File.open(video.destination),
-      filename: video_title
-    )
-    @song.video.attach(video.destination)
-    @song.save
-    # delete downloaded video file
-    File.delete(video.destination)
+    @song.update(state: 0)
+    puts "Downloading song: #{@song.link}"
+    YoutubeDL::Command.config.default_options = { 
+      format: 'bv[height<=720]+bestaudio',
+      merge_output_format: 'mp4'
+     }
+    state = YoutubeDL.download(@song.link)
+      .on_progress do |state:, line:|
+        puts "Progress: #{state.progress}%"
+      end
+      .on_error do |state:, line:|
+        puts "Error: #{state.error}"
+        @song.update(state: -1)
+      end
+      .on_complete do |state:, line:|
+        puts "Completed song download: #{state.destination}"
+        ProcessSongJob.perform_later(@song.id, state.destination.to_s, state.info['duration_string'], state.info['fulltitle'], state.info['thumbnail'])
+      end
+      .call
   end
 end
