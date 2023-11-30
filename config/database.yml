@@ -26,6 +26,5 @@ test:
 
 production:
   <<: *default
-  database: storage/production.sqlite3
   database: goatdjprod
   password: <%= ENV['PG_PASSWORD'] %>
