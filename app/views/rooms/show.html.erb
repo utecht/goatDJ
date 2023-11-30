@@ -13,6 +13,7 @@
       <% else %>
       <%= video_tag @song.video, controls: true, data: {'room-target': 'videoPlayer'} if @song and @song.video.attached? %>
       <% end %>
+      <h4><span data-room-target="currentlyPlaying">Currently Playing: <%= @room.current_song.title %></span></h4>
       <h4><span data-room-target="listenerCount"><%= @room.listener_count %></span> listeners</h4>
       <button data-action="click->room#play" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5">Play</button>
       <button data-action="click->room#pause" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5">Pause</button>

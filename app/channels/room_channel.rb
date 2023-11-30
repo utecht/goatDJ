@@ -2,9 +2,10 @@ class RoomChannel < ApplicationCable::Channel
   def subscribed
     stream_from "room_#{params[:room_id]}"
     @room = Room.find(params[:room_id])
-    @room.add_listener
+    guid = SecureRandom.uuid
+    @room.add_listener(guid)
     current_time = Time.now.to_f
-    transmit({ command: 'init_sync', timestamp: current_time })
+    transmit({ command: 'init_sync', timestamp: current_time, guid: guid })
     ActionCable.server.broadcast("room_#{params[:room_id]}", { command: 'listener_count', listener_count: @room.listener_count })
   end
 
@@ -17,9 +18,13 @@ class RoomChannel < ApplicationCable::Channel
   def receive(data)
     puts data.pretty_inspect
     case data['command']
-    when 'init_sync'
+    when 'resync'
       current_time = Time.now.to_f
       transmit({ command: 'init_sync', timestamp: current_time })
+    when 'ack_next_song'
+      @room = Room.find(params[:room_id])
+      guid = data['guid']
+      @room.update_last_active(guid)
     when 'request_sync'
       puts "SYNC REQUEST"
       @room = Room.find(params[:room_id])

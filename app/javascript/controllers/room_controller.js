@@ -3,7 +3,7 @@ import consumer from "../channels/consumer"
 
 export default class extends Controller {
   static values = { id: Number, currentTime: Number, songStart: Number, audio: Boolean }
-  static targets = [ "videoPlayer", "listenerCount" ];
+  static targets = [ "videoPlayer", "listenerCount", "currentlyPlaying" ];
 
   connect() {
     console.log("Connected to room channel: " + this.idValue);
@@ -39,7 +39,12 @@ export default class extends Controller {
       this.syncSong();
     } else if (data.command == "next_song") {
       this.playNext(data);
+      this.roomChannel.send({ command: 'ack_next_song', guid: this.myId });
     } else if (data.command == "init_sync") {
+      this.currentTimeValue = data.timestamp;
+      this.myId = data.guid;
+      this.syncSong();
+    } else if (data.command == "resync") {
       this.currentTimeValue = data.timestamp;
       this.syncSong();
     } else if (data.command == "listener_count") {
@@ -53,6 +58,7 @@ export default class extends Controller {
     } else {
       this.videoPlayerTarget.src = data.song_url;
     }
+    this.currentlyPlayingTarget.innerHTML = data.song_title;
     this.songStartValue = data.songStart;
     this.currentTimeValue = data.currentTime;
     this.syncSong();

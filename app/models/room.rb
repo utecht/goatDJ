@@ -45,14 +45,16 @@ class Room < ApplicationRecord
 	def next_song
 		current_playlist = self.playlist.drop(1)
 		self.set_playlist(current_playlist)
-		if listener_count > 0
+		self.update_active_listeners
+		if self.listener_count > 0
 			if self.playlist.empty?
 				self.add_song_to_playlist(Song.all.sample)
 			end
 	        song_url = rails_blob_url(self.current_song.video, only_path: true) if self.current_song&.video&.attached?
 	        audio_url = rails_blob_url(self.current_song.audio, only_path: true) if self.current_song&.audio&.attached?
+	        song_title = self.current_song&.title
 			self.start_song
-		    ActionCable.server.broadcast("room_#{self.id}", {command: 'next_song', song_url: song_url, audio_url: audio_url, songStart: self.song_start_time, currentTime: Time.now.to_f })
+		    ActionCable.server.broadcast("room_#{self.id}", {command: 'next_song', song_title: song_title, song_url: song_url, audio_url: audio_url, songStart: self.song_start_time, currentTime: Time.now.to_f })
 		end
 	end
 
@@ -77,7 +79,8 @@ class Room < ApplicationRecord
 		REDIS.get("rooms:#{self.id}:listener_count").to_i
 	end
 
-	def add_listener
+	def add_listener(guid)
+		self.update_last_active(guid)
 		REDIS.incr("rooms:#{self.id}:listener_count")
 		if self.listener_count == 1
 			unless self.current_song
@@ -94,6 +97,22 @@ class Room < ApplicationRecord
 		if self.listener_count == 0
 			# self.end_song
 		end
+	end
+
+	def update_last_active(guid)
+		REDIS.hset("rooms:#{self.id}:last_active", {guid: Time.now.to_f})
+	end
+
+	def update_active_listeners
+		REDIS.keys("rooms:#{self.id}:last_active").each do |key|
+			last_active = REDIS.hget(key, 0)
+			if last_active.to_f < self.song_start_time
+				REDIS.hdel("rooms:#{self.id}:last_active", key)
+			end
+		end
+		listener_count = REDIS.hlen("rooms:#{self.id}:last_active") 
+		REDIS.set("rooms:#{self.id}:listener_count", listener_count)
+	    ActionCable.server.broadcast("room_#{self.id}", { command: 'listener_count', listener_count: listener_count })
 	end
 
 end
