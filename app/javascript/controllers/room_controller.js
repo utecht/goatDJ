@@ -3,7 +3,7 @@ import consumer from "../channels/consumer"
 
 export default class extends Controller {
   static values = { id: Number, currentTime: Number, songStart: Number, audio: Boolean }
-  static targets = [ "videoPlayer", "listenerCount", "currentlyPlaying" ];
+  static targets = [ "videoPlayer", "listenerCount", "currentlyPlaying", "thumbnail" ];
 
   connect() {
     console.log("Connected to room channel: " + this.idValue);
@@ -55,6 +55,7 @@ export default class extends Controller {
   playNext(data) {
     if (this.audioValue) {
       this.videoPlayerTarget.src = data.audio_url;
+      this.thumbnailTarget.src = data.thumbnail_url;
     } else {
       this.videoPlayerTarget.src = data.song_url;
     }

@@ -52,9 +52,19 @@ class Room < ApplicationRecord
 			end
 	        song_url = rails_blob_url(self.current_song.video, only_path: true) if self.current_song&.video&.attached?
 	        audio_url = rails_blob_url(self.current_song.audio, only_path: true) if self.current_song&.audio&.attached?
+	        thumbnail_url = rails_blob_url(self.current_song.thumbnail, only_path: true) if self.current_song&.thumbnail&.attached?
 	        song_title = self.current_song&.title
 			self.start_song
-		    ActionCable.server.broadcast("room_#{self.id}", {command: 'next_song', song_title: song_title, song_url: song_url, audio_url: audio_url, songStart: self.song_start_time, currentTime: Time.now.to_f })
+			data = {
+			    command: 'next_song',
+			    song_title: song_title,
+			    song_url: song_url,
+			    audio_url: audio_url,
+			    thumbnail_url: thumbnail_url,
+			    songStart: self.song_start_time,
+			    currentTime: Time.now.to_f
+			}
+		    ActionCable.server.broadcast("room_#{self.id}", data)
 		end
 	end
 
