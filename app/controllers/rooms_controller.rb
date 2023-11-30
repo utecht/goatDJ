@@ -17,6 +17,8 @@ class RoomsController < ApplicationController
       @room.add_songs_to_playlist(Song.all.sample(1))
       @song = @room.current_song
     end
+    puts params
+    @audio = params[:audio].present?
   end
 
   # GET /rooms/new

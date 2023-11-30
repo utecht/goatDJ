@@ -87,7 +87,9 @@ class Room < ApplicationRecord
 	end
 
 	def remove_listener
+		puts "user left"
 		REDIS.decr("rooms:#{self.id}:listener_count")
+		puts "listener count: #{self.listener_count}"
 		if self.listener_count == 0
 			# self.end_song
 		end

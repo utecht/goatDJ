@@ -17,6 +17,9 @@ class RoomChannel < ApplicationCable::Channel
   def receive(data)
     puts data.pretty_inspect
     case data['command']
+    when 'init_sync'
+      current_time = Time.now.to_f
+      transmit({ command: 'init_sync', timestamp: current_time })
     when 'request_sync'
       puts "SYNC REQUEST"
       @room = Room.find(params[:room_id])

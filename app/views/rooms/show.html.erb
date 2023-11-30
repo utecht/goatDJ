@@ -8,11 +8,20 @@
     <p class="mb-5"><%= @room.description %></p>
 
     <div>
+      <% if @audio %>
+      <%= audio_tag @song.audio, controls: true, data: {'room-target': 'videoPlayer'} if @song and @song.audio.attached? %>
+      <% else %>
       <%= video_tag @song.video, controls: true, data: {'room-target': 'videoPlayer'} if @song and @song.video.attached? %>
+      <% end %>
       <h4><span data-room-target="listenerCount"><%= @room.listener_count %></span> listeners</h4>
       <button data-action="click->room#play" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5">Play</button>
       <button data-action="click->room#pause" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5">Pause</button>
       <button data-action="click->room#sync" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5">Sync</button>
+      <% if @audio %>
+      <%= link_to "Show Video", room_path(@room), class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5" %>
+      <% else %>
+      <%= link_to "Audio Only", room_path(@room, audio: true), class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5" %>
+      <% end %>
     </div>
   </div>
   <div class="m-5">

@@ -22,8 +22,9 @@ export default class extends Controller {
   }
 
   syncSong() {
-    this.videoPlayerTarget.currentTime = this.currentTimeValue - this.songStartValue;
     console.log("Setting player timestamp: " + (this.currentTimeValue - this.songStartValue));
+    this.videoPlayerTarget.currentTime = this.currentTimeValue - this.songStartValue;
+    this.videoPlayerTarget.play();
   }
 
   processCommand(data) {
@@ -55,11 +56,12 @@ export default class extends Controller {
   }
 
   play() {
-    this.roomChannel.send({ command: 'play' });
+    this.videoPlayerTarget.play();
+    this.roomChannel.send({ command: 'init_sync' });
   }
 
   pause() {
-    this.roomChannel.send({ command: 'pause' });
+    this.videoPlayerTarget.pause();
   }
 
   sync() {
