@@ -36,6 +36,14 @@ class SongsController < ApplicationController
     redirect_to songs_url
   end
 
+  def retry_download
+    # all songs with nil state or state less than 0
+    Song.where(state: nil).or(Song.where('state < 0')).each do |song|
+      DownloadSongJob.perform_later(song.id)
+    end
+    redirect_to songs_url
+  end
+
   def queue_download
     DownloadSongJob.perform_later(@song.id)
     redirect_to song_url(params[:id])

@@ -5,6 +5,11 @@ class AttachVideoJob < ApplicationJob
     @song = Song.find(args[0])
     video_destination = args[1]
 
+    unless File.exist?(video_destination)
+      puts "Failed to attach video to song: #{video_destination} does not exist"
+      return
+    end
+
     video_blob = ActiveStorage::Blob.create_and_upload!(
       io: File.open(video_destination),
       filename: @song.title ? "#{@song.title}.mp4" : 'unknown_song.mp4'

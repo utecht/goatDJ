@@ -17,6 +17,7 @@ Rails.application.routes.draw do
     get :mass_export, on: :collection
     get :new_mass_import, on: :collection
     post :create_mass_import, on: :collection
+    post :retry_download, on: :collection
     member do
       post :queue_download
     end
