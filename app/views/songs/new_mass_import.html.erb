@@ -1,0 +1,11 @@
+<h3 class="font-bold text-4xl mb-8">Song Mass Exporter</h3>
+<%= form_with url: create_mass_import_songs_path, method: :post, class: "space-y-4" do |form| %>
+  <div class="flex flex-col mb-4">
+    <label for="links" class="text-lg font-medium">Links:</label>
+    <%= form.text_area :links, id: "links", class: "block shadow rounded-md border border-gray-200 outline-none px-3 py-2 mt-2 w-full dark:text-black", rows: 10, placeholder: "Enter links here..." %>
+  </div>
+
+  <div>
+    <%= form.submit "Submit", class: "rounded-lg py-3 px-5 bg-blue-600 text-white inline-block font-medium cursor-pointer" %>
+  </div>
+<% end %>

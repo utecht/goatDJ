@@ -5,14 +5,15 @@ class ProcessSongJob < ApplicationJob
 
   def perform(*args)
     @song = Song.find(args[0])
-    video_destination = args[1]
-    duration_string = args[2]
-    video_title = args[3]
-    thumbnail_url = args[4]
+    duration_string = args[1]
+    video_title = args[2]
+    thumbnail_url = args[3]
 
-    puts "Processing song: #{video_destination}"
+    puts "Processing song: #{@song.link}"
     # convert minutes:seconds to seconds
     duration = duration_string.split(':').map(&:to_i).inject(0) { |a, b| a * 60 + b }
+
+    @song.update(title: video_title, length: duration)
 
     thumbnail_file = URI.open(thumbnail_url)
 
@@ -24,17 +25,5 @@ class ProcessSongJob < ApplicationJob
 
     # Attach the blob to your model
     @song.thumbnail.attach(blob)
-
-    video_blob = ActiveStorage::Blob.create_and_upload!(
-      io: File.open(video_destination),
-      filename: video_title
-    )
-
-    @song.video.attach(video_blob)
-    @song.update(title: video_title, length: duration, state: video_blob.byte_size)
-    @song.save
-
-    # delete downloaded video file
-    File.delete(video_destination)
   end
 end

@@ -41,7 +41,7 @@
 
   <p class="my-5">
     <strong class="block font-medium mb-1">Audio:</strong>
-    <%= link_to song.audio.filename, song.audio if song.audio.attached? %>
+    <%= audio_tag song.audio, controls: true if song.audio.attached? %>
   </p>
 
   <% if action_name != "show" %>
