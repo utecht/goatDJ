@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import consumer from "../channels/consumer"
 
 export default class extends Controller {
-  static values = { id: Number, currentTime: Number, songStart: Number }
+  static values = { id: Number, currentTime: Number, songStart: Number, audio: Boolean }
   static targets = [ "videoPlayer", "listenerCount" ];
 
   connect() {
@@ -48,7 +48,11 @@ export default class extends Controller {
   }
 
   playNext(data) {
-    this.videoPlayerTarget.src = data.song_url;
+    if (this.audioValue) {
+      this.videoPlayerTarget.src = data.audio_url;
+    } else {
+      this.videoPlayerTarget.src = data.song_url;
+    }
     this.songStartValue = data.songStart;
     this.currentTimeValue = data.currentTime;
     this.syncSong();

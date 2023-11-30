@@ -1,4 +1,4 @@
-<div class="mx-auto w-full flex" data-controller="room" data-room-id-value="<%= @room.id %>" data-room-current-time-value="<%= Time.now.to_f %>" data-room-song-start-value="<%= @room.song_start_time %>">
+<div class="mx-auto w-full flex" data-controller="room" data-room-id-value="<%= @room.id %>" data-room-current-time-value="<%= Time.now.to_f %>" data-room-song-start-value="<%= @room.song_start_time %>" data-room-audio-value="<%= @audio %>">
   <div class="mx-auto">
     <% if notice.present? %>
       <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-lg inline-block" id="notice"><%= notice %></p>

@@ -50,8 +50,9 @@ class Room < ApplicationRecord
 				self.add_song_to_playlist(Song.all.sample)
 			end
 	        song_url = rails_blob_url(self.current_song.video, only_path: true) if self.current_song&.video&.attached?
+	        audio_url = rails_blob_url(self.current_song.audio, only_path: true) if self.current_song&.audio&.attached?
 			self.start_song
-		    ActionCable.server.broadcast("room_#{self.id}", {command: 'next_song', song_url: song_url, songStart: self.song_start_time, currentTime: Time.now.to_f })
+		    ActionCable.server.broadcast("room_#{self.id}", {command: 'next_song', song_url: song_url, audio_url: audio_url, songStart: self.song_start_time, currentTime: Time.now.to_f })
 		end
 	end
 
