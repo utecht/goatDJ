@@ -42,13 +42,32 @@ class Room < ApplicationRecord
 		self.next_song
 	end
 
+	def next_song_picker
+		song_count = Song.count
+		recently_played = JSON.parse(REDIS.get("rooms:#{self.id}:recently_played") || "[]")
+		if recently_played.count > song_count / 2
+			recently_played.shift
+		end
+		song = Song.all.sample
+		counter = 0
+		while recently_played.include?(song.id) and counter < 10
+			song = Song.all.sample
+			counter += 1
+		end
+		# if recently played is not an array make it one
+		recently_played << song.id
+		REDIS.set("rooms:#{self.id}:recently_played", recently_played.to_json)
+		self.add_song_to_playlist(song)
+	end
+
+
 	def next_song
 		current_playlist = self.playlist.drop(1)
 		self.set_playlist(current_playlist)
 		self.update_active_listeners
 		if self.listener_count > 0
 			if self.playlist.empty?
-				self.add_song_to_playlist(Song.all.sample)
+				self.next_song_picker
 			end
 	        song_url = rails_blob_url(self.current_song.video, only_path: true) if self.current_song&.video&.attached?
 	        audio_url = rails_blob_url(self.current_song.audio, only_path: true) if self.current_song&.audio&.attached?
